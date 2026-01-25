@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bookshelf',
     'relationship_app',
-    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -70,8 +69,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'LibraryProject.wsgi.application'
+AUTH_USER_MODEL = 'bookshelf.CustomUser'
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
+
 
 
 # Database
