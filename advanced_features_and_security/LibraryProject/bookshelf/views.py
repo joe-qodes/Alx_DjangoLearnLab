@@ -57,3 +57,23 @@ def book_list(request):
     books = Book.objects.all()
     return render(request, "bookshelf/book_list.html", {"books": books})
 
+
+from django.shortcuts import render
+from django.db.models import Q
+from .models import Book
+from .forms import BookForm
+
+def book_search(request):
+    query = request.GET.get("q", "")
+
+    books = Book.objects.filter(
+        Q(title__icontains=query) |
+        Q(author__icontains=query)
+    )
+
+    return render(request, "bookshelf/book_list.html", {"books": books})
+
+def secure_view(request):
+    response = render(request, "bookshelf/book_list.html")
+    response["Content-Security-Policy"] = "default-src 'self'"
+    return response
