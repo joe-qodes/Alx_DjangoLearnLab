@@ -31,7 +31,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     The 'books' field comes from the related_name defined
     in the Book model's ForeignKey.
     """
-    books = BookSerializer(many= 'true', read_only = 'true')
+    books = BookSerializer(many= True, read_only = True)
     
     class Meta:
         model = Author
