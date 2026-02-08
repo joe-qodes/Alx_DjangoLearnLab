@@ -24,7 +24,7 @@ class Book(models.Model):
     using: author.books.all()
     """
     title = models.TextField()
-    publication_year = models.IntegerField(max_length=4)
+    publication_year = models.IntegerField()
     author = models.ForeignKey(
         Author,
         on_delete=models.CASCADE,
