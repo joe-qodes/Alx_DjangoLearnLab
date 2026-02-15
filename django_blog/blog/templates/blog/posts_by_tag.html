@@ -1,12 +1,14 @@
 {% extends "blog/base.html" %}
 {% block content %}
-<h2>Posts tagged with "{{ tag.name }}"</h2>
+<h2>Posts tagged with "{{ tag }}"</h2>
+
 {% for post in posts %}
-    <div>
-        <a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a>
-        <p>{{ post.content|truncatewords:30 }}</p>
-    </div>
+  <div>
+    <h3><a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a></h3>
+    <p>{{ post.content|truncatewords:30 }}</p>
+  </div>
 {% empty %}
-    <p>No posts with this tag.</p>
+  <p>No posts with this tag.</p>
 {% endfor %}
+
 {% endblock %}
