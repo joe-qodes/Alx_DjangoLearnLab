@@ -1,0 +1,28 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<h2>Blog Posts</h2>
+{% for post in posts %}
+  <div>
+    <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+    <p>By {{ post.author }} | {{ post.date_posted|date:"F d, Y" }}</p>
+    <p>{{ post.content|truncatechars:150 }}</p>
+    <a href="{{ post.get_absolute_url }}">Read more</a>
+  </div>
+  <hr>
+{% empty %}
+  <p>No posts yet.</p>
+{% endfor %}
+
+<!-- Pagination -->
+<div>
+  {% if is_paginated %}
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}
