@@ -15,7 +15,10 @@ class RegisterForm(UserCreationForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'tags']
+        widgets = {
+            'tags': forms.TextInput(attrs={'placeholder': 'Comma-separated tags'}),
+        }
 
 
 class CommentForm(forms.ModelForm):
@@ -25,3 +28,6 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Add a comment...'}),
         }
+
+class PostSearchForm(forms.Form):
+    query = forms.CharField(max_length=200, required=False, label='Search')

@@ -7,8 +7,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post
 from .models import Comment
+from .forms import PostSearchForm
 from .forms import CommentForm
 from django.urls import reverse
+from django.db.models import Q
+from taggit.models import Tag
 
 def posts_view(request):
     posts = Post.objects.all().order_by('-published_date')
@@ -166,4 +169,23 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author   
-    
+
+def search_posts(request):
+    form = PostSearchForm(request.GET or None)
+    results = []
+    query = ""
+    if form.is_valid():
+        query = form.cleaned_data.get('query')
+        if query:
+            results = Post.objects.filter(
+                Q(title__icontains=query) |
+                Q(content__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct()
+    context = {'form': form, 'results': results, 'query': query}
+    return render(request, 'blog/search_results.html', context)
+
+def posts_by_tag(request, tag_slug):
+    tag = get_object_or_404(Tag, slug=tag_slug)
+    posts = Post.objects.filter(tags__in=[tag]).distinct()
+    return render(request, 'blog/posts_by_tag.html', {'tag': tag, 'posts': posts})
