@@ -80,13 +80,19 @@ class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
-    ordering = ['-date_posted']
+    ordering = ['-published_date']
     paginate_by = 5  # Optional: pagination
 
 # Show single post
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CommentForm()  # Add the comment form
+        context['comments'] = Comment.objects.filter(post=self.object)
+        return context
 
 # Create new post
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -133,11 +139,7 @@ def CommentCreateView(request, post_id):
             comment.author = request.user
             comment.post = post
             comment.save()
-            return redirect('post-detail', pk=post.id)
-    else:
-        form = CommentForm()
     return redirect('post-detail', pk=post.id)
-
 # Edit comment
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
