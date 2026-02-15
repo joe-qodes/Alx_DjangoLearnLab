@@ -8,6 +8,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from .models import Post
 from .models import Comment
 from .forms import PostSearchForm
+from .forms import PostForm
 from .forms import CommentForm
 from django.urls import reverse
 from django.db.models import Q
@@ -100,8 +101,9 @@ class PostDetailView(DetailView):
 # Create new post
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
+    form_class = PostForm
     template_name = 'blog/post_form.html'
-    fields = ['title', 'content']
+    
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -110,8 +112,9 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 # Update post
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
+    form_class = PostForm
     template_name = 'blog/post_form.html'
-    fields = ['title', 'content']
+    
 
     def form_valid(self, form):
         form.instance.author = self.request.user
