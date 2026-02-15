@@ -1,0 +1,15 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block content %}
+<h2>Profile</h2>
+<form method="POST">
+    {% csrf_token %}
+    <label>Username:</label> {{ user.username }} <br>
+    <label>Email:</label> <input type="email" name="email" value="{{ user.email }}"><br>
+    <button type="submit">Update Profile</button>
+</form>
+{% for message in messages %}
+<p>{{ message }}</p>
+{% endfor %}
+{% endblock %}
