@@ -1,11 +1,11 @@
-from django.shortcuts import render
-
-from rest_framework import generics, permissions
+from rest_framework import generics, status, permissions
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 from .serializers import RegisterSerializer, UserSerializer
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view, permission_classes
 
 User = get_user_model()
 
@@ -40,3 +40,24 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def follow_user(request, user_id):
+    target_user = get_object_or_404(User, id=user_id)
+    if target_user == request.user:
+        return Response({"error": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    target_user.followers.add(request.user)
+    return Response({"success": f"You are now following {target_user.username}."})
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def unfollow_user(request, user_id):
+    target_user = get_object_or_404(User, id=user_id)
+    if target_user == request.user:
+        return Response({"error": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    target_user.followers.remove(request.user)
+    return Response({"success": f"You have unfollowed {target_user.username}."})

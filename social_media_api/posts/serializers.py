@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Post, Comment
-
+from accounts.serializers import UserSerializer
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source="author.username")
@@ -19,3 +19,5 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = "__all__"
         read_only_fields = ["author", "created_at", "updated_at"]
+
+
