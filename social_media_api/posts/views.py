@@ -39,11 +39,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def feed(request):
-    # Users that the current user is following
     following_users = request.user.following.all()
-    
-    # Get posts from followed users, newest first
     posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
-    
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
