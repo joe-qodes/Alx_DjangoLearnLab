@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['your-domain.com', 'your-app.herokuapp.com']
+ALLOWED_HOSTS = ['*']
 
 #Security Settings
 SECURE_BROWSER_XSS_FILTER = True
@@ -94,6 +94,16 @@ DATABASES = {
         default=os.getenv('DATABASE_URL')  # Heroku provides this automatically
     )
 }
+
+if DATABASES['default'] == {}:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+    }
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -150,3 +160,4 @@ MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+PORT = int(os.environ.get("PORT", 8000))
