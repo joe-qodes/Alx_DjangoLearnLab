@@ -7,16 +7,79 @@ from .serializers import RegisterSerializer, UserSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 
-User = get_user_model()
+# User = get_user_model() 
+# from .models import User as CustomUser
 
+# class RegisterView(generics.CreateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = RegisterSerializer
+
+#     def create(self, request, *args, **kwargs):
+#         response = super().create(request, *args, **kwargs)
+#         user = User.objects.get(username=response.data['username'])
+#         token, _ = Token.objects.get_or_create(user=user)
+#         return Response({"user": response.data, "token": token.key})
+
+
+# class LoginView(generics.GenericAPIView):
+#     def post(self, request):
+#         username = request.data.get("username")
+#         password = request.data.get("password")
+
+#         user = authenticate(username=username, password=password)
+
+#         if user:
+#             token, _ = Token.objects.get_or_create(user=user)
+#             return Response({"token": token.key})
+#         return Response({"error": "Invalid credentials"}, status=400)
+
+
+# class ProfileView(generics.RetrieveUpdateAPIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#     serializer_class = UserSerializer
+
+#     def get_object(self):
+#         return self.request.user
+
+# @api_view(['POST'])
+# @permission_classes([permissions.IsAuthenticated])
+# def follow_user(request, user_id):
+#     target_user = get_object_or_404(User, id=user_id)
+#     if target_user == request.user:
+#         return Response({"error": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+    
+#     target_user.followers.add(request.user)
+#     return Response({"success": f"You are now following {target_user.username}."})
+
+
+# @api_view(['POST'])
+# @permission_classes([permissions.IsAuthenticated])
+# def unfollow_user(request, user_id):
+#     target_user = get_object_or_404(User, id=user_id)
+#     if target_user == request.user:
+#         return Response({"error": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+    
+#     target_user.followers.remove(request.user)
+#     return Response({"success": f"You have unfollowed {target_user.username}."})
+
+from django.shortcuts import render, get_object_or_404
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from django.contrib.auth import authenticate, get_user_model
+from rest_framework.authtoken.models import Token
+from .serializers import RegisterSerializer, UserSerializer
+from rest_framework.decorators import api_view, permission_classes
+
+# Explicitly import your User model
+from .models import User as CustomUser
 
 class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        user = User.objects.get(username=response.data['username'])
+        user = CustomUser.objects.get(username=response.data['username'])
         token, _ = Token.objects.get_or_create(user=user)
         return Response({"user": response.data, "token": token.key})
 
@@ -41,13 +104,14 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def follow_user(request, user_id):
-    target_user = get_object_or_404(User, id=user_id)
+    target_user = get_object_or_404(CustomUser.objects.all(), id=user_id)  # Explicit CustomUser.objects.all()
     if target_user == request.user:
         return Response({"error": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     target_user.followers.add(request.user)
     return Response({"success": f"You are now following {target_user.username}."})
 
@@ -55,9 +119,9 @@ def follow_user(request, user_id):
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def unfollow_user(request, user_id):
-    target_user = get_object_or_404(User, id=user_id)
+    target_user = get_object_or_404(CustomUser.objects.all(), id=user_id)  # Explicit CustomUser.objects.all()
     if target_user == request.user:
         return Response({"error": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     target_user.followers.remove(request.user)
     return Response({"success": f"You have unfollowed {target_user.username}."})
