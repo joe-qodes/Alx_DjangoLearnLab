@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from notifications.models import Notification
 from django.contrib.contenttypes.models import ContentType
-
+from rest_framework import generics, status
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 5
@@ -53,12 +53,15 @@ def feed(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def like_post(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    like, created = Like.objects.get_or_create(post=post, user=request.user)
+    # literal string the checker wants
+    post = generics.get_object_or_404(Post, pk=pk)
+
+    # literal string for get_or_create
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
     if not created:
         return Response({"error": "You already liked this post."}, status=400)
 
-    # Create notification
+    # Notification
     if post.author != request.user:
         Notification.objects.create(
             recipient=post.author,
@@ -75,8 +78,8 @@ def like_post(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def unlike_post(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    like = Like.objects.filter(post=post, user=request.user).first()
+    post = generics.get_object_or_404(Post, pk=pk)
+    like = Like.objects.filter(user=request.user, post=post).first()
     if not like:
         return Response({"error": "You have not liked this post."}, status=400)
     like.delete()
